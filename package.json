@@ -1,0 +1,30 @@
+{
+  "name": "apikeyapp",
+  "version": "0.0.0",
+  "description": "Generates Cloudant API keys and passes the URL and keys to the offline app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start-dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ukmadlz/apikeyapp.git"
+  },
+  "author": "Mike Elsmore <mike.elsmore@uk.ibm.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ukmadlz/apikeyapp/issues"
+  },
+  "homepage": "https://github.com/ukmadlz/apikeyapp#readme",
+  "dependencies": {
+    "cloudant": "^1.4.1",
+    "dotenv": "^2.0.0",
+    "hapi": "^12.1.0",
+    "path": "^0.12.7"
+  },
+  "engines": {
+    "node": "4.2.5"
+  }
+}
