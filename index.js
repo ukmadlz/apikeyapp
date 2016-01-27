@@ -19,6 +19,12 @@ var Path = require('path');
 var Cloudant = require('cloudant');
 
 // Config services
+// Validate
+if (typeof process.env.VCAP_SERVICES === 'undefined' ||
+  typeof process.env.DATABASE === 'undefined') {
+  throw new Error('Missing ENV variables');
+}
+
 // VCAP Services
 var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
 
@@ -53,6 +59,13 @@ server.connection({
   },
 });
 
+// Error return
+var errorFunc = function(er, callback) {
+  callback({
+    error: er.message,
+  }).code(er.statusCode);
+};
+
 // Route to return the url to access a Cloudant DB
 server.route({
     method: ['GET', 'POST'], // Must handle both GET and POST
@@ -68,29 +81,29 @@ server.route({
         // Or you can read the security settings from a database.
         db.get_security(function(er, result) {
           if (er) {
-            throw er;
+            errorFunc(er, reply);
+          } else {
+            var security = result.cloudant;
+            security[api.key] = ['_reader', '_writer', '_replicator'];
+
+            db.set_security(security, function(er, result) {
+              if (er) {
+                errorFunc(er, reply);
+              } else {
+                var url = 'https://' +
+                api.key +
+                ':' +
+                api.password +
+                '@' +
+                cloudantCreds.host +
+                '/' +
+                database;
+                reply({
+                  url: url,
+                }).code(200);
+              }
+            });
           }
-
-          var security = result.cloudant;
-          security[api.key] = ['_reader', '_writer', '_replicator'];
-
-          db.set_security(security, function(er, result) {
-            if (er) {
-              throw er;
-            };
-
-            var url = 'https://' +
-            api.key +
-            ':' +
-            api.password +
-            '@' +
-            cloudantCreds.host +
-            '/' +
-            database;
-            reply({
-              url: url,
-            }).code(200);
-          });
         });
       });
     },
